@@ -33,16 +33,15 @@
         }
 
         .target-area {
-            background: #f5f5f5;
+            background: #fff;
             padding: 30px;
             text-align: center;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
+            border: 1px solid #000;
         }
 
         .target-label {
             font-size: 0.9em;
-            color: #666;
             margin-bottom: 10px;
         }
 
@@ -64,10 +63,6 @@
             font-weight: bold;
         }
 
-        .timer.warning {
-            color: #c00;
-        }
-
         .options {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -80,24 +75,23 @@
             font-size: 1.4em;
             font-family: monospace;
             letter-spacing: 4px;
-            background: #f9f9f9;
-            border: 2px solid #ddd;
+            background: #fff;
+            border: 1px solid #000;
             cursor: pointer;
         }
 
         .option-btn:hover {
             background: #eee;
-            border-color: #999;
         }
 
         .option-btn.correct {
-            background: #d4edda;
-            border-color: #28a745;
+            background: #fff;
+            border: 3px solid #000;
+            font-weight: bold;
         }
 
         .option-btn.incorrect {
-            background: #f8d7da;
-            border-color: #dc3545;
+            background: #ccc;
         }
 
         .option-btn:disabled {
@@ -114,13 +108,11 @@
 
         .stat-box {
             padding: 10px;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
+            border: 1px solid #000;
         }
 
         .stat-label {
             font-size: 0.8em;
-            color: #666;
         }
 
         .stat-value {
@@ -135,14 +127,6 @@
             margin-bottom: 15px;
         }
 
-        .feedback.correct {
-            color: #28a745;
-        }
-
-        .feedback.incorrect {
-            color: #dc3545;
-        }
-
         .controls {
             text-align: center;
         }
@@ -150,25 +134,25 @@
         .start-btn {
             padding: 12px 30px;
             font-size: 1em;
-            background: #333;
-            color: white;
+            background: #000;
+            color: #fff;
             border: none;
             cursor: pointer;
         }
 
         .start-btn:hover {
-            background: #555;
+            background: #333;
         }
 
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
-            color: #666;
+            color: #000;
             text-decoration: none;
         }
 
         .back-link:hover {
-            color: #333;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -272,7 +256,6 @@
             const variations = createSimilarCodes(gameState.currentCode);
             const allOptions = [gameState.currentCode, ...variations];
             
-            // Shuffle
             for (let i = allOptions.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
@@ -289,9 +272,7 @@
             
             document.getElementById('round').textContent = gameState.round;
             document.getElementById('feedback').textContent = '';
-            document.getElementById('feedback').className = 'feedback';
             
-            // Time decreases each round (15s down to 3s minimum)
             gameState.timeLimit = Math.max(3, 15 - (gameState.round - 1) * 0.5);
             gameState.timeLeft = gameState.timeLimit;
             gameState.startTime = Date.now();
@@ -304,7 +285,6 @@
             gameState.timer = setInterval(() => {
                 gameState.timeLeft -= 0.1;
                 timerEl.textContent = gameState.timeLeft.toFixed(1) + 's';
-                timerEl.className = gameState.timeLeft <= 3 ? 'timer warning' : 'timer';
                 
                 if (gameState.timeLeft <= 0) {
                     timeUp();
@@ -334,7 +314,6 @@
                 gameState.score += Math.round(gameState.timeLeft * 10);
                 gameState.correct++;
                 feedback.textContent = 'Correct! +' + Math.round(gameState.timeLeft * 10);
-                feedback.className = 'feedback correct';
                 
                 if (!gameState.bestTime || responseTime < gameState.bestTime) {
                     gameState.bestTime = responseTime;
@@ -343,7 +322,6 @@
                 buttons[index].classList.add('incorrect');
                 buttons[gameState.correctOption].classList.add('correct');
                 feedback.textContent = 'Wrong';
-                feedback.className = 'feedback incorrect';
             }
             
             gameState.totalAttempts++;
@@ -364,7 +342,6 @@
             buttons[gameState.correctOption].classList.add('correct');
             
             document.getElementById('feedback').textContent = 'Time up';
-            document.getElementById('feedback').className = 'feedback incorrect';
             
             gameState.totalAttempts++;
             updateStats();
@@ -413,7 +390,6 @@
             
             document.getElementById('startBtn').textContent = 'Start Game';
             document.getElementById('feedback').textContent = 'Stopped';
-            document.getElementById('feedback').className = 'feedback';
             
             const buttons = document.querySelectorAll('.option-btn');
             buttons.forEach(btn => {
