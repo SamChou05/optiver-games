@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optiver Zap-N Training Games</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 210, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 0, 128, 0.08) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .logo {
+            font-size: 0.9em;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #00d2ff;
+            margin-bottom: 20px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        h1 {
+            font-size: clamp(2.5em, 6vw, 4.5em);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #00d2ff 50%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--card-color-1) 0%, var(--card-color-2) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .game-card:hover::before {
+            opacity: 0.15;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 60px var(--glow-color);
+        }
+
+        .game-card.shapeshift {
+            --card-color-1: #00d2ff;
+            --card-color-2: #3a7bd5;
+            --glow-color: rgba(0, 210, 255, 0.2);
+        }
+
+        .game-card.code-compare {
+            --card-color-1: #667eea;
+            --card-color-2: #764ba2;
+            --glow-color: rgba(118, 75, 162, 0.2);
+        }
+
+        .game-card.digit {
+            --card-color-1: #f093fb;
+            --card-color-2: #f5576c;
+            --glow-color: rgba(245, 87, 108, 0.2);
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--card-color-1) 0%, var(--card-color-2) 100%);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-card h2 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .game-card p {
+            color: #999;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .game-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75em;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+
+        .play-indicator {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .play-indicator::after {
+            content: '→';
+            font-size: 1.4em;
+            color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .play-indicator {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-card:hover .play-indicator::after {
+            transform: translateX(4px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .footer p {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .tip-box {
+            background: rgba(255, 200, 0, 0.1);
+            border: 1px solid rgba(255, 200, 0, 0.3);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-top: 50px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .tip-icon {
+            font-size: 1.5em;
+        }
+
+        .tip-content h3 {
+            color: #ffc800;
+            font-size: 1em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .tip-content p {
+            color: #999;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+            
+            header {
+                margin-bottom: 50px;
+            }
+
+            .game-card {
+                padding: 30px;
+            }
+
+            .tip-box {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="grid-overlay"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">Optiver Training</div>
+            <h1>Zap-N Games</h1>
+            <p class="subtitle">Sharpen your reflexes, pattern recognition, and mental math with these cognitive training games.</p>
+        </header>
+
+        <div class="games-grid">
+            <a href="shapeshift.html" class="game-card shapeshift">
+                <div class="card-content">
+                    <div class="game-icon">◐</div>
+                    <h2>Shapeshift</h2>
+                    <p>React to shapes appearing anywhere on screen. Press → for circles, ← for squares. Test your reflexes and peripheral vision.</p>
+                    <div class="game-tags">
+                        <span class="tag">REFLEXES</span>
+                        <span class="tag">VISUAL</span>
+                        <span class="tag">SPEED</span>
+                    </div>
+                </div>
+                <div class="play-indicator"></div>
+            </a>
+
+            <a href="code-compare.html" class="game-card code-compare">
+                <div class="card-content">
+                    <div class="game-icon">≡</div>
+                    <h2>Code-Compare</h2>
+                    <p>Memorize a 7-character code and find its exact match among similar options. Time limits decrease as you progress.</p>
+                    <div class="game-tags">
+                        <span class="tag">MEMORY</span>
+                        <span class="tag">RECOGNITION</span>
+                        <span class="tag">FOCUS</span>
+                    </div>
+                </div>
+                <div class="play-indicator"></div>
+            </a>
+
+            <a href="digit.html" class="game-card digit">
+                <div class="card-content">
+                    <div class="game-icon">∑</div>
+                    <h2>Digit</h2>
+                    <p>Mental arithmetic challenge. Process numbers quickly and accurately under time pressure.</p>
+                    <div class="game-tags">
+                        <span class="tag">MATH</span>
+                        <span class="tag">MENTAL</span>
+                        <span class="tag">ARITHMETIC</span>
+                    </div>
+                </div>
+                <div class="play-indicator"></div>
+            </a>
+        </div>
+
+        <div class="tip-box">
+            <span class="tip-icon">💡</span>
+            <div class="tip-content">
+                <h3>Pro Tip</h3>
+                <p>For Code-Compare, try assigning sounds to digits (like "zee" for 0, "wun" for 1). Using both auditory and visual memory makes sequences much easier to recall!</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Practice daily for best results. Consistency beats intensity.</p>
+        </footer>
+    </div>
+</body>
+</html>
+
